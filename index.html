@@ -21,34 +21,20 @@
             <i class="fa-solid fa-layer-group text-xl text-white"></i>
         </div>
         <h1 class="text-2xl font-bold tracking-tight">AI 스마트 플래시카드</h1>
-        <p class="text-xs text-slate-400 mt-1">사진에서 단어를 추출하는 벼락치기 암기 도구</p>
+        <p class="text-xs text-slate-400 mt-1">사진에서 단어를 추출하고 나만의 단어장 만들기</p>
     </header>
 
     <!-- Main Container -->
     <main class="w-full max-w-md flex-1 flex flex-col gap-4 pb-6">
         
         <!-- Upload Section -->
-        <div class="bg-slate-800 border border-slate-700/60 rounded-2xl p-5 shadow-xl flex flex-col gap-3">
-            <div>
-                <h2 class="text-sm font-semibold flex items-center gap-2 mb-1 text-indigo-400">
-                    <i class="fa-solid fa-camera"></i> 사진으로 카드 만들기
-                </h2>
-                <p class="text-xs text-slate-400">한자·영어·한글 교재 사진을 올리고 원하는 카드 형식을 선택하세요.</p>
-            </div>
-
-            <!-- Target Mode Selector -->
-            <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700/50 flex flex-col gap-1.5">
-                <label for="targetMode" class="text-xs font-semibold text-slate-300 flex items-center justify-between">
-                    <span><i class="fa-solid fa-language text-indigo-400 mr-1"></i> 뒷면 변환 선택 (한글 단어 사진용)</span>
-                </label>
-                <select id="targetMode" class="bg-slate-800 text-slate-200 text-xs py-2 px-3 rounded-lg border border-slate-600 focus:outline-none focus:border-indigo-500 font-medium cursor-pointer">
-                    <option value="auto">자동 감지 (한자/영어 사진 ➔ 한글 뜻)</option>
-                    <option value="hanzi">한글 단어 ➔ 뒷면에 한자(漢字) 표시</option>
-                    <option value="english">한글 단어 ➔ 뒷면에 영어(English) 표시</option>
-                </select>
-            </div>
+        <div class="bg-slate-800 border border-slate-700/60 rounded-2xl p-5 shadow-xl">
+            <h2 class="text-sm font-semibold flex items-center gap-2 mb-2 text-indigo-400">
+                <i class="fa-solid fa-camera"></i> 사진으로 카드 만들기
+            </h2>
+            <p class="text-xs text-slate-400 mb-4">교재, 한자, 영어 단어장 사진을 선택하면 AI가 단어와 뜻을 추출합니다.</p>
             
-            <div class="flex items-center gap-2 mt-1">
+            <div class="flex items-center gap-2">
                 <label class="flex-1 cursor-pointer bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm py-2.5 px-4 rounded-xl border border-slate-600 text-center font-medium transition flex items-center justify-center gap-2">
                     <i class="fa-regular fa-file-image"></i>
                     <span id="fileNameText">파일 선택</span>
@@ -95,8 +81,8 @@
                     <!-- 뒷면 (Back) -->
                     <div class="absolute inset-0 w-full h-full bg-indigo-950 border border-indigo-800/60 rounded-3xl p-6 flex flex-col items-center justify-center text-center backface-hidden rotate-y-180 shadow-inner">
                         <span class="absolute top-4 left-4 text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-md" id="backBadge">BACK</span>
-                        <div id="backContent" class="text-5xl font-black text-indigo-100 px-4 leading-none">
-                            뜻 / 번역
+                        <div id="backContent" class="text-3xl font-bold text-indigo-100 px-4">
+                            뜻
                         </div>
                         <span class="absolute bottom-4 text-xs text-indigo-400/60"><i class="fa-solid fa-hand-pointer mr-1"></i> 터치해서 앞면으로</span>
                     </div>
@@ -120,17 +106,17 @@
         <div id="emptyState" class="flex-1 flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-slate-800 rounded-3xl">
             <i class="fa-solid fa-book-open text-4xl text-slate-700 mb-3"></i>
             <p class="text-sm text-slate-400 font-medium">등록된 카드가 없습니다.</p>
-            <p class="text-xs text-slate-500 mt-1">상단에서 사진과 옵션을 선택하고 AI 변환을 눌러보세요.</p>
+            <p class="text-xs text-slate-500 mt-1">상단에서 사진을 선택하고 AI 변환을 눌러보세요.</p>
         </div>
 
     </main>
 
-    <!-- 로딩 중 표시 모달 (Loading Overlay) -->
+    <!-- 🌟 로딩 중 표시 모달 (Loading Overlay) 🌟 -->
     <div id="loadingOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 hidden">
         <div class="bg-slate-800 border border-slate-700 p-6 rounded-3xl shadow-2xl flex flex-col items-center max-w-xs text-center">
             <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
             <p class="text-base font-bold text-white mb-1">변환 중입니다</p>
-            <p class="text-xs text-slate-400">AI가 사진을 분석하고 단어를 변환하고 있습니다.<br>잠시만 기다려 주세요...</p>
+            <p class="text-xs text-slate-400">AI가 사진을 분석하고 있습니다.<br>잠시만 기다려 주세요...</p>
         </div>
     </div>
 
@@ -181,8 +167,8 @@
 
             const btn = document.getElementById('convertBtn');
             const loadingOverlay = document.getElementById('loadingOverlay');
-            const targetMode = document.getElementById('targetMode').value;
 
+            // 로딩 오버레이 켜기 및 버튼 비활성화
             btn.disabled = true;
             loadingOverlay.classList.remove('hidden');
 
@@ -192,8 +178,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         imageBase64: selectedImageBase64,
-                        mimeType: selectedMimeType,
-                        targetMode: targetMode
+                        mimeType: selectedMimeType
                     })
                 });
 
@@ -216,6 +201,7 @@
                 console.error(err);
                 showToast(err.message || '사진 분석 중 오류가 발생했습니다.');
             } finally {
+                // 로딩 오버레이 끄기 및 버튼 활성화
                 btn.disabled = false;
                 loadingOverlay.classList.add('hidden');
             }
@@ -240,14 +226,14 @@
             const meaningText = card.meaning || '';
 
             if (!isReversed) {
-                document.getElementById('frontBadge').innerText = "FRONT (단어)";
-                document.getElementById('backBadge').innerText = "BACK (뒷면/뜻)";
+                document.getElementById('frontBadge').innerText = "FRONT (단어/한자)";
+                document.getElementById('backBadge').innerText = "BACK (뜻)";
                 frontEl.innerHTML = `<div class="text-6xl font-black text-white leading-none">${wordText}</div>`;
-                backEl.innerHTML = `<div class="text-5xl font-black text-white leading-none">${meaningText}</div>`;
+                backEl.innerHTML = `<div class="text-3xl font-bold text-white">${meaningText}</div>`;
             } else {
-                document.getElementById('frontBadge').innerText = "FRONT (뒷면/뜻)";
-                document.getElementById('backBadge').innerText = "BACK (단어)";
-                frontEl.innerHTML = `<div class="text-5xl font-black text-white leading-none">${meaningText}</div>`;
+                document.getElementById('frontBadge').innerText = "FRONT (뜻)";
+                document.getElementById('backBadge').innerText = "BACK (단어/한자)";
+                frontEl.innerHTML = `<div class="text-3xl font-bold text-white">${meaningText}</div>`;
                 backEl.innerHTML = `<div class="text-6xl font-black text-white leading-none">${wordText}</div>`;
             }
 
