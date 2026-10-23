@@ -13,7 +13,7 @@
         .rotate-y-180 { transform: rotateY(180deg); }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-between p-4">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-between p-4 relative">
 
     <!-- Header -->
     <header class="w-full max-w-md text-center py-4">
@@ -111,6 +111,15 @@
 
     </main>
 
+    <!-- 🌟 로딩 중 표시 모달 (Loading Overlay) 🌟 -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center z-50 hidden">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-3xl shadow-2xl flex flex-col items-center max-w-xs text-center">
+            <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-base font-bold text-white mb-1">변환 중입니다</p>
+            <p class="text-xs text-slate-400">AI가 사진을 분석하고 있습니다.<br>잠시만 기다려 주세요...</p>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-slate-200 px-4 py-2.5 rounded-xl shadow-2xl border border-slate-700 text-xs font-medium transition-all duration-300 opacity-0 pointer-events-none z-50">
         알림 메시지
@@ -156,12 +165,14 @@
                 return;
             }
 
-            showToast('AI가 사진에서 단어를 분석하고 있습니다...');
             const btn = document.getElementById('convertBtn');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            // 로딩 오버레이 켜기 및 버튼 비활성화
             btn.disabled = true;
+            loadingOverlay.classList.remove('hidden');
 
             try {
-                // Vercel Serverless API Route
                 const response = await fetch('/api/analyze-image', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -190,7 +201,9 @@
                 console.error(err);
                 showToast(err.message || '사진 분석 중 오류가 발생했습니다.');
             } finally {
+                // 로딩 오버레이 끄기 및 버튼 활성화
                 btn.disabled = false;
+                loadingOverlay.classList.add('hidden');
             }
         }
 
