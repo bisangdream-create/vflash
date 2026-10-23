@@ -9,49 +9,27 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Vercel 환경 변수에 GEMINI_API_KEY가 설정되지 않았습니다.' });
     }
 
-    const { imageBase64, mimeType, targetMode } = req.body || {};
+    const { imageBase64, mimeType } = req.body || {};
 
     if (!imageBase64) {
       return res.status(400).json({ error: '이미지 데이터가 전달되지 않았습니다.' });
     }
 
-    let modeInstruction = "";
-
-    if (targetMode === 'hanzi') {
-      modeInstruction = `
-[MODE: KOREAN TO HANZI]
-- Extract Korean words/vocabulary from the image for "word".
-- For "meaning": Provide ONLY the exact corresponding Chinese character(s) (Hanzi/漢字) for each Korean word.
-- Do NOT include pinyin, pronunciation, or extra Korean explanations.
-- Output ONLY pure Hanzi in "meaning".`;
-    } else if (targetMode === 'english') {
-      modeInstruction = `
-[MODE: KOREAN TO ENGLISH]
-- Extract Korean words/vocabulary from the image for "word".
-- For "meaning": Provide ONLY the pure English translation/word corresponding to the Korean word.
-- Do NOT include phonetic symbols or extra explanations.
-- Output ONLY pure English in "meaning".`;
-    } else {
-      modeInstruction = `
-[MODE: AUTO DETECT]
-- Extract all vocabulary (Hanzi, English, or Korean) from the image.
-- For Hanzi/English words in the image: Output pure word in "word" and Korean meaning in "meaning".
-- For Korean words in the image: Output Korean in "word" and pure Hanzi/English in "meaning".`;
-    }
-
-    const promptText = `Analyze this image containing vocabulary/words.
-Extract all target vocabulary with their corresponding counterpart according to these strict rules:
-
-${modeInstruction}
+    const promptText = `Analyze this image containing Chinese characters (Hanzi), English, or Korean vocabulary.
+Extract all vocabulary words with their meanings.
 
 STRICT FORMATTING RULES:
-1. "word": Pure target word (Korean/English/Hanzi) without extra tags.
-2. "meaning": Pure counterpart (Hanzi, English, or Korean) without any pronunciation or extra explanation.
-3. Keep the output strictly as a valid JSON array without markdown formatting or code blocks:
+1. For Chinese characters (Hanzi): Output ONLY the pure Hanzi in "word" (no pinyin, no pronunciation, no Korean reading, no extra text).
+2. For English words: Output ONLY the pure English word in "word" (no phonetic symbols, no translation).
+3. For meanings: Output ONLY the clean meaning in Korean (or target explanation).
+4. Do NOT combine languages or add pronunciation below/next to the word.
+
+Output strictly valid JSON array without markdown formatting or code blocks:
 [
-  {"word": "단어", "meaning": "뜻/한자/영어"}
+  {"word": "單字/Word", "meaning": "뜻/해설"}
 ]`;
 
+    // Using gemini-3.5-flash-lite as requested
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
 
     const response = await fetch(apiUrl, {
